@@ -6,9 +6,13 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+import { Language, languages, useTranslation } from '@/lib/translations';
 
 const Index = () => {
+  const [language, setLanguage] = useState<Language>('ru');
+  const { t } = useTranslation(language);
   const [balance, setBalance] = useState(1500.50);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({ username: 'Player123', level: 15 });
@@ -21,17 +25,17 @@ const Index = () => {
   const [jackpotPool, setJackpotPool] = useState(12750.30);
 
   const games = [
-    { id: 1, name: 'Рулетка', icon: 'Target', color: 'bg-red-500', players: 124 },
-    { id: 2, name: 'Джекпот', icon: 'Crown', color: 'bg-yellow-500', players: 89 },
-    { id: 3, name: 'Coinflip', icon: 'Coins', color: 'bg-blue-500', players: 45 },
-    { id: 4, name: 'Crash', icon: 'TrendingUp', color: 'bg-green-500', players: 78 },
+    { id: 1, name: t('games.roulette'), icon: 'Target', color: 'bg-red-500', players: 124 },
+    { id: 2, name: t('games.jackpot'), icon: 'Crown', color: 'bg-yellow-500', players: 89 },
+    { id: 3, name: t('games.coinflip'), icon: 'Coins', color: 'bg-blue-500', players: 45 },
+    { id: 4, name: t('games.crash'), icon: 'TrendingUp', color: 'bg-green-500', players: 78 },
   ];
 
   const cases = [
-    { id: 1, name: 'Legendary Case', price: 500, image: '🎁', rarity: 'legendary' },
-    { id: 2, name: 'Epic Case', price: 250, image: '📦', rarity: 'epic' },
-    { id: 3, name: 'Rare Case', price: 100, image: '🎀', rarity: 'rare' },
-    { id: 4, name: 'Common Case', price: 50, image: '📋', rarity: 'common' },
+    { id: 1, name: t('cases.legendary'), price: 500, image: '🎁', rarity: 'legendary' },
+    { id: 2, name: t('cases.epic'), price: 250, image: '📦', rarity: 'epic' },
+    { id: 3, name: t('cases.rare'), price: 100, image: '🎀', rarity: 'rare' },
+    { id: 4, name: t('cases.common'), price: 50, image: '📋', rarity: 'common' },
   ];
 
   const inventory = [
@@ -73,18 +77,40 @@ const Index = () => {
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center neon-glow">
               <Icon name="Gamepad2" size={24} className="text-black" />
             </div>
-            <h1 className="text-2xl font-bold text-primary">CSGO RUN</h1>
+            <h1 className="text-2xl font-bold text-primary">{t('site.title')}</h1>
           </div>
           
           <nav className="hidden md:flex space-x-6">
-            {['Главная', 'Игры', 'Кейсы', 'Инвентарь', 'История'].map((item) => (
-              <Button key={item} variant="ghost" className="text-foreground hover:text-primary">
+            {[t('nav.home'), t('nav.games'), t('nav.cases'), t('nav.inventory'), t('nav.history')].map((item, index) => (
+              <Button key={index} variant="ghost" className="text-foreground hover:text-primary">
                 {item}
               </Button>
             ))}
           </nav>
 
           <div className="flex items-center space-x-4">
+            {/* Language Selector */}
+            <Select value={language} onValueChange={(value: Language) => setLanguage(value)}>
+              <SelectTrigger className="w-32">
+                <SelectValue>
+                  <div className="flex items-center space-x-2">
+                    <span>{languages[language].flag}</span>
+                    <span className="hidden sm:inline">{languages[language].name}</span>
+                  </div>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(languages).map(([code, lang]) => (
+                  <SelectItem key={code} value={code}>
+                    <div className="flex items-center space-x-2">
+                      <span>{lang.flag}</span>
+                      <span>{lang.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             {isLoggedIn ? (
               <>
                 <div className="text-right">
@@ -93,25 +119,25 @@ const Index = () => {
                 </div>
                 <Button className="neon-border">
                   <Icon name="Plus" size={16} className="mr-2" />
-                  Пополнить
+                  {t('nav.topup')}
                 </Button>
               </>
             ) : (
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="bg-primary text-primary-foreground neon-glow hover:bg-primary/90">
-                    Войти
+                    {t('nav.login')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-card border-border">
                   <DialogHeader>
-                    <DialogTitle className="text-primary">Авторизация</DialogTitle>
+                    <DialogTitle className="text-primary">{t('login.title')}</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleLogin} className="space-y-4">
-                    <Input placeholder="Логин" className="bg-input border-border" />
-                    <Input type="password" placeholder="Пароль" className="bg-input border-border" />
+                    <Input placeholder={t('login.username')} className="bg-input border-border" />
+                    <Input type="password" placeholder={t('login.password')} className="bg-input border-border" />
                     <Button type="submit" className="w-full bg-primary text-primary-foreground neon-glow">
-                      Войти
+                      {t('login.submit')}
                     </Button>
                   </form>
                 </DialogContent>
@@ -125,22 +151,22 @@ const Index = () => {
       <section className="py-12 px-4 text-center">
         <div className="container mx-auto">
           <h2 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Добро пожаловать в будущее игр
+            {t('hero.title')}
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Испытай удачу в самых захватывающих играх CS:GO
+            {t('hero.subtitle')}
           </p>
           
           {isLoggedIn && (
             <div className="max-w-md mx-auto mb-8">
               <Card className="game-card">
                 <CardHeader>
-                  <CardTitle className="text-primary">🎁 Ежедневный бонус</CardTitle>
+                  <CardTitle className="text-primary">{t('bonus.title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-accent mb-2">+$50.00</div>
                   <Button className="w-full neon-border" onClick={() => setBalance(balance + 50)}>
-                    Забрать бонус
+                    {t('bonus.claim')}
                   </Button>
                 </CardContent>
               </Card>
@@ -152,7 +178,7 @@ const Index = () => {
       {/* Games Section */}
       <section className="py-12 px-4">
         <div className="container mx-auto">
-          <h3 className="text-3xl font-bold mb-8 text-center text-primary">🎮 Игры</h3>
+          <h3 className="text-3xl font-bold mb-8 text-center text-primary">{t('games.title')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {games.map((game) => (
               <Card key={game.id} className="game-card cursor-pointer">
@@ -162,7 +188,7 @@ const Index = () => {
                   </div>
                   <CardTitle className="text-center text-foreground">{game.name}</CardTitle>
                   <CardDescription className="text-center">
-                    <Badge variant="secondary">{game.players} игроков</Badge>
+                    <Badge variant="secondary">{game.players} {t('games.players')}</Badge>
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -172,17 +198,17 @@ const Index = () => {
           {/* Live Games */}
           <Tabs defaultValue="roulette" className="w-full">
             <TabsList className="grid w-full grid-cols-4 bg-secondary">
-              <TabsTrigger value="roulette">Рулетка</TabsTrigger>
-              <TabsTrigger value="jackpot">Джекпот</TabsTrigger>
-              <TabsTrigger value="coinflip">Coinflip</TabsTrigger>
-              <TabsTrigger value="crash">Crash</TabsTrigger>
+              <TabsTrigger value="roulette">{t('games.roulette')}</TabsTrigger>
+              <TabsTrigger value="jackpot">{t('games.jackpot')}</TabsTrigger>
+              <TabsTrigger value="coinflip">{t('games.coinflip')}</TabsTrigger>
+              <TabsTrigger value="crash">{t('games.crash')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="roulette" className="mt-6">
               <Card className="game-card">
                 <CardHeader>
-                  <CardTitle className="text-primary">🎯 Рулетка</CardTitle>
-                  <CardDescription>Выбери цвет и выиграй до x14!</CardDescription>
+                  <CardTitle className="text-primary">{t('roulette.title')}</CardTitle>
+                  <CardDescription>{t('roulette.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center mb-6">
@@ -190,9 +216,9 @@ const Index = () => {
                       🎰
                     </div>
                     <div className="flex justify-center space-x-4 mb-4">
-                      <Button className="bg-red-500 hover:bg-red-600">Красный x2</Button>
-                      <Button className="bg-green-500 hover:bg-green-600">Зеленый x14</Button>
-                      <Button className="bg-gray-700 hover:bg-gray-600">Черный x2</Button>
+                      <Button className="bg-red-500 hover:bg-red-600">{t('roulette.red')}</Button>
+                      <Button className="bg-green-500 hover:bg-green-600">{t('roulette.green')}</Button>
+                      <Button className="bg-gray-700 hover:bg-gray-600">{t('roulette.black')}</Button>
                     </div>
                     <div className="flex items-center space-x-4 justify-center">
                       <Input 
@@ -207,7 +233,7 @@ const Index = () => {
                         disabled={rouletteSpinning}
                         className="neon-border"
                       >
-                        {rouletteSpinning ? 'Крутим...' : 'Играть'}
+                        {rouletteSpinning ? t('roulette.spinning') : t('roulette.play')}
                       </Button>
                     </div>
                   </div>
@@ -218,8 +244,8 @@ const Index = () => {
             <TabsContent value="jackpot" className="mt-6">
               <Card className="game-card">
                 <CardHeader>
-                  <CardTitle className="text-yellow-500">👑 Джекпот</CardTitle>
-                  <CardDescription>Общий банк: ${jackpotPool.toFixed(2)}</CardDescription>
+                  <CardTitle className="text-yellow-500">{t('jackpot.title')}</CardTitle>
+                  <CardDescription>{t('jackpot.pool')} ${jackpotPool.toFixed(2)}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -228,10 +254,10 @@ const Index = () => {
                     </div>
                     <Progress value={75} className="h-2" />
                     <div className="text-sm text-muted-foreground text-center">
-                      Розыгрыш через 2:34
+                      {t('jackpot.timer')}
                     </div>
                     <div className="flex justify-center">
-                      <Button className="neon-border">Вступить в джекпот</Button>
+                      <Button className="neon-border">{t('jackpot.join')}</Button>
                     </div>
                   </div>
                 </CardContent>
@@ -241,15 +267,15 @@ const Index = () => {
             <TabsContent value="coinflip" className="mt-6">
               <Card className="game-card">
                 <CardHeader>
-                  <CardTitle className="text-blue-500">🪙 Coinflip</CardTitle>
-                  <CardDescription>Орел или решка - 50/50 шансы</CardDescription>
+                  <CardTitle className="text-blue-500">{t('coinflip.title')}</CardTitle>
+                  <CardDescription>{t('coinflip.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center space-y-4">
                     <div className="text-6xl mb-4">🪙</div>
                     <div className="flex justify-center space-x-4">
-                      <Button className="bg-blue-500 hover:bg-blue-600">Орел</Button>
-                      <Button className="bg-purple-500 hover:bg-purple-600">Решка</Button>
+                      <Button className="bg-blue-500 hover:bg-blue-600">{t('coinflip.heads')}</Button>
+                      <Button className="bg-purple-500 hover:bg-purple-600">{t('coinflip.tails')}</Button>
                     </div>
                     <div className="flex items-center space-x-4 justify-center">
                       <Input 
@@ -258,7 +284,7 @@ const Index = () => {
                         onChange={(e) => setCoinflipBet(Number(e.target.value))}
                         className="w-32"
                       />
-                      <Button className="neon-border">Бросить монету</Button>
+                      <Button className="neon-border">{t('coinflip.flip')}</Button>
                     </div>
                   </div>
                 </CardContent>
@@ -268,8 +294,8 @@ const Index = () => {
             <TabsContent value="crash" className="mt-6">
               <Card className="game-card">
                 <CardHeader>
-                  <CardTitle className="text-green-500">📈 Crash</CardTitle>
-                  <CardDescription>Выйди до краха и умножь ставку!</CardDescription>
+                  <CardTitle className="text-green-500">{t('crash.title')}</CardTitle>
+                  <CardDescription>{t('crash.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center space-y-4">
@@ -286,7 +312,7 @@ const Index = () => {
                         onChange={(e) => setCoinflipBet(Number(e.target.value))}
                         className="w-32"
                       />
-                      <Button onClick={handleCrash} className="neon-border">Играть</Button>
+                      <Button onClick={handleCrash} className="neon-border">{t('crash.play')}</Button>
                     </div>
                   </div>
                 </CardContent>
@@ -299,7 +325,7 @@ const Index = () => {
       {/* Cases Section */}
       <section className="py-12 px-4 bg-card/30">
         <div className="container mx-auto">
-          <h3 className="text-3xl font-bold mb-8 text-center text-primary">📦 Кейсы</h3>
+          <h3 className="text-3xl font-bold mb-8 text-center text-primary">{t('cases.title')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {cases.map((case_) => (
               <Card key={case_.id} className="game-card cursor-pointer">
@@ -308,14 +334,14 @@ const Index = () => {
                   <CardTitle className="text-center">{case_.name}</CardTitle>
                   <CardDescription className="text-center">
                     <Badge variant={case_.rarity === 'legendary' ? 'default' : 'secondary'}>
-                      {case_.rarity}
+                      {t(`rarity.${case_.rarity}`)}
                     </Badge>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-accent mb-4">${case_.price}</div>
-                    <Button className="w-full neon-border">Открыть кейс</Button>
+                    <Button className="w-full neon-border">{t('cases.open')}</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -328,7 +354,7 @@ const Index = () => {
       {isLoggedIn && (
         <section className="py-12 px-4">
           <div className="container mx-auto">
-            <h3 className="text-3xl font-bold mb-8 text-center text-primary">🎒 Инвентарь</h3>
+            <h3 className="text-3xl font-bold mb-8 text-center text-primary">{t('inventory.title')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {inventory.map((item) => (
                 <Card key={item.id} className="game-card">
@@ -339,11 +365,11 @@ const Index = () => {
                   <CardContent>
                     <div className="text-center">
                       <Badge variant={item.rarity === 'legendary' ? 'default' : 'secondary'} className="mb-2">
-                        {item.rarity}
+                        {t(`rarity.${item.rarity}`)}
                       </Badge>
                       <div className="text-xl font-bold text-accent mb-4">${item.value.toFixed(2)}</div>
                       <Button variant="outline" size="sm" className="neon-border">
-                        Продать
+                        {t('inventory.sell')}
                       </Button>
                     </div>
                   </CardContent>
@@ -358,12 +384,12 @@ const Index = () => {
       <footer className="border-t border-border bg-card/50 py-8">
         <div className="container mx-auto px-4 text-center">
           <div className="flex justify-center space-x-6 mb-4">
-            <Button variant="ghost" size="sm">Поддержка</Button>
-            <Button variant="ghost" size="sm">Правила</Button>
-            <Button variant="ghost" size="sm">FAQ</Button>
+            <Button variant="ghost" size="sm">{t('footer.support')}</Button>
+            <Button variant="ghost" size="sm">{t('footer.rules')}</Button>
+            <Button variant="ghost" size="sm">{t('footer.faq')}</Button>
           </div>
           <p className="text-muted-foreground text-sm">
-            © 2024 CSGO RUN. Играй ответственно. 18+
+            {t('footer.copyright')}
           </p>
         </div>
       </footer>
